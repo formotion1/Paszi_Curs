@@ -39,7 +39,7 @@ def get_hwid():
 
 
 # === 2. Проверка лицензии ===
-PUBLIC_KEY = b"""
+"""PUBLIC_KEY = b"""
 
 """-----BEGIN PUBLIC KEY-----
 MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAkP6svES7LstL1dNWoxT/
@@ -52,7 +52,7 @@ CwIDAQAB
 -----END PUBLIC KEY-----
 """
 """
-
+"""
 def verify_license(current_hwid):
     try:
         with open("license.json", "r") as f:
