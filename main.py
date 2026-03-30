@@ -40,6 +40,7 @@ def get_hwid():
 
 # === 2. Проверка лицензии ===
 PUBLIC_KEY = b"""
+/*
 -----BEGIN PUBLIC KEY-----
 MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAkP6svES7LstL1dNWoxT/
 xbXERVHk1Bqoa1bIzAW3X0qflAnCL1QiYS/sN3W7V2dSZr4Q+3uMkWeUwG9i1n2Y
@@ -49,6 +50,7 @@ IuNfgmSk+B11vwDVEHwkfJq11dFWH6wRDl8G6m8O3i6HtqLB22wQUKdY2JVU3VMH
 FQRg/jRQRCiyjUxL7KYeuaCPRi7d52zcRawNK089lxMXtk+xExji1yI0kkDaBW90
 CwIDAQAB
 -----END PUBLIC KEY-----
+*/
 """
 
 def verify_license(current_hwid):
