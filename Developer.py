@@ -1,5 +1,6 @@
 import json
 import base64
+import os
 from datetime import datetime
 from cryptography.hazmat.primitives import hashes, serialization
 from cryptography.hazmat.primitives.asymmetric import padding, rsa
@@ -58,6 +59,13 @@ def generate_license(hwid, expiration_date):
         json.dump(license_data, f, indent=4)
 
     print("License generated!")
+
+# === Удаление приватного ключа ===
+    try:
+        os.remove("private_key.pem")
+        print("Private key deleted!")
+    except FileNotFoundError:
+        print("Private key already deleted.")
 
 
 # === Пример использования ===

@@ -8,8 +8,8 @@ from cryptography.hazmat.primitives import hashes, serialization
 from cryptography.hazmat.primitives.asymmetric import padding
 
 
-# === 1. Генерация HWID ===
-def get_hwid():
+# === Получение данных оборудования ===
+def get_hardware_info():
     c = wmi.WMI()
 
     try:
@@ -32,27 +32,22 @@ def get_hwid():
     except:
         mac = "unknown_mac"
 
+    return cpu_id, disk_serial, motherboard, mac
+
+
+# === Генерация HWID ===
+def generate_hwid(cpu_id, disk_serial, motherboard, mac):
     raw_string = cpu_id + disk_serial + motherboard + mac
-    hwid = hashlib.sha256(raw_string.encode()).hexdigest()
-
-    return hwid
+    return hashlib.sha256(raw_string.encode()).hexdigest()
 
 
-# === 2. Проверка лицензии ===
-PRIVATE_KEY = b"""
-
------BEGIN PRIVATE KEY-----
-MIIBIjANBgkqhkiG9w0BAQEFAAOCAQ8AMIIBCgKCAQEAkP6svES7LstL1dNWoxT/
-xbXERVHk1Bqoa1bIzAW3X0qflAnCL1QiYS/sN3W7V2dSZr4Q+3uMkWeUwG9i1n2Y
-agdyh06dOdP3Ia9mNBWTqLk5M8uwVVxEuQWkQLwGYyXwGvA20Z3/PuWjf8gL2U5Z
-lwwtON0sBDPWJvLE+stGxBNGQGQ5/8pVXs7xQHs8e7JYz+qeTdcUn3bIOqbZtUt6
-IuNfgmSk+B11vwDVEHwkfJq11dFWH6wRDl8G6m8O3i6HtqLB22wQUKdY2JVU3VMH
-FQRg/jRQRCiyjUxL7KYeuaCPRi7d52zcRawNK089lxMXtk+xExji1yI0kkDaBW90
-CwIDAQAB
------END PRIVATE KEY-----
-"""
+# === Обёртка (для совместимости) ===
+def get_hwid():
+    cpu_id, disk_serial, motherboard, mac = get_hardware_info()
+    return generate_hwid(cpu_id, disk_serial, motherboard, mac)
 
 
+# === Проверка лицензии ===
 def verify_license(current_hwid):
     try:
         with open("license.json", "r") as f:
@@ -61,7 +56,8 @@ def verify_license(current_hwid):
         signature = base64.b64decode(license_data.pop("signature"))
         data_bytes = json.dumps(license_data).encode()
 
-        public_key = serialization.load_pem_public_key(PUBLIC_KEY)
+        with open("public_key.pem", "rb") as f:
+            public_key = serialization.load_pem_public_key(f.read())
 
         public_key.verify(
             signature,
@@ -92,10 +88,23 @@ def verify_license(current_hwid):
 
 # === Точка входа ===
 if __name__ == "__main__":
-    print("Your HWID:", get_hwid())
+    cpu_id, disk_serial, motherboard, mac = get_hardware_info()
+
+    print()
+    print("=== Данные для формирования HWID ===")
+    print()
+    print("Серийный номер материнской платы:", motherboard)
+    print("ID процессора:", cpu_id)
+    print("Серийный номер диска:", disk_serial)
+    print("MAC-адрес:", mac)
     print()
 
-    if verify_license(get_hwid()):
+    hwid = generate_hwid(cpu_id, disk_serial, motherboard, mac)
+
+    print("Your HWID:", hwid)
+    print()
+
+    if verify_license(hwid):
         print("Program is running...")
     else:
         print("Access denied.")
